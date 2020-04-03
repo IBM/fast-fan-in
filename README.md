@@ -91,7 +91,7 @@ channels tested, while the **Reflect** approach suffers a steep penalty.
 
 ## Notes
 
-If you have any questions or issues you can create a new [issue here][issues].
+If you have any questions or issues you can create a new [issue here][https://github.com/ibm/fast-fan-in/issues].
 
 Pull requests are very welcome! Make sure your patches are well tested.
 Ideally create a topic branch for every separate change you make. For
