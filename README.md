@@ -106,16 +106,16 @@ var a, b, c chan MyCustomType
 // specific element type that will flow over the channels by performing type assertions
 out := fan.Config{
     SelectFunc: func(done <-chan struct{}, in, out interface{}) bool {
-		select {
-		case <-done:
-			return true
-		case element, more := <-in.(chan MyCustomType):
-			if !more {
-				return true
-			}
-			out.(chan MyCustomType) <- element
-		}
-		return false
+        select {
+        case <-done:
+            return true
+        case element, more := <-in.(chan MyCustomType):
+            if !more {
+                return true
+            }
+            out.(chan MyCustomType) <- element
+        }
+        return false
     },
 }.FanIn(done, a, b, c).(<-chan MyCustomType)
 // note that we also type-assert the returned channel to be the appropriate
