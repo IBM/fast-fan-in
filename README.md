@@ -63,7 +63,7 @@ ways:
 - **Reflect**: Our fallback 100% reflection-based approach (which is the fastest reflection-
   based option that we could figure out).
 
-![benchmark visualization](/IBM/fast-fan-in/raw/master/img/benchmarks.png)
+![benchmark visualization](https://raw.githubusercontent.com/IBM/fast-fan-in/master/img/benchmarks.png)
 
 Each cluster of bars represents a different number of elements sent through the
 fan.
