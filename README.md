@@ -89,6 +89,44 @@ channels tested, while the **Reflect** approach suffers a steep penalty.
 
 ## Usage
 
+Fan several channels of a custom type into one channel:
+
+```go
+type MyCustomType struct {
+    // many fields
+}
+
+// we got these three channel variables from some previous logic that
+// launched goroutines that are writing values on them
+var a, b, c chan MyCustomType
+
+// let's assume that data is flowing over these three channels
+
+// we combine these three channels and provide a function that tells the fan about the
+// specific element type that will flow over the channels by performing type assertions
+out := fan.Config{
+    SelectFunc: func(done <-chan struct{}, in, out interface{}) bool {
+	 		select {
+	 		case <-done:
+	 			return true
+	 		case element, more := <-in.(chan MyCustomType):
+	 			if !more {
+	 				return true
+	 			}
+	 			out.(chan MyCustomType) <- element
+	 		}
+	 		return false
+    },
+}.FanIn(done, a, b, c).(<-chan MyCustomType)
+// note that we also type-assert the returned channel to be the appropriate
+// element type!
+
+// now we can read all of the data from those three channels on out!
+for data := range out {
+    fmt.Println(data)
+}
+```
+
 ## Notes
 
 If you have any questions or issues you can create a new [issue here][https://github.com/ibm/fast-fan-in/issues].
