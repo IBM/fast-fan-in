@@ -148,10 +148,9 @@ good performance on channels of any element type.
 The graph below visualizes the relative performance of fanning-in channels three
 ways:
 
-- **Concrete**: Code specialized completely to the channel type (like the snippet above)
+- **Concrete**: Code specialized completely to the channel type (like the snippet above in [rationale](#rationale))
 - **Hybrid**: Our approach with an anonymous function that provides the type information
-- **Reflect**: Our fallback 100% reflection-based approach (which is the fastest reflection-
-  based option that we could figure out).
+- **Reflect**: Our fallback 100% reflection-based approach (which is the fastest reflection-based option that we could figure out).
 
 ![benchmark visualization](https://raw.githubusercontent.com/IBM/fast-fan-in/master/img/benchmarks.png)
 
