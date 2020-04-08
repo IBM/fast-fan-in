@@ -1,3 +1,9 @@
+/*
+Copyright IBM Corporation All Rights Reserved.
+
+SPDX-License-Identifier: Apache-2.0
+*/
+
 package fan_test
 
 import (
