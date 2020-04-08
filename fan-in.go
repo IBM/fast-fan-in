@@ -28,7 +28,7 @@ For non-primitive types, this package provides both an easy-to-use (but ineffici
 reflection-based approach that requires no boilerplate and an efficient implementation
 that can be customized via a helper function to work with any Go type.
 
-To use the inefficient reflection-base approach on a custom type, you can do:
+To use the inefficient reflection-based approach on a custom type, you can do:
 
     type MyCustomType struct {
         A, B int
