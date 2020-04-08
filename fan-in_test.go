@@ -298,7 +298,7 @@ func BenchmarkFanIn(b *testing.B) {
 	}
 }
 
-// Here's a simple example of fanly doubling integers using the fan-out, fan-in
+// Here's a simple example of doubling integers using the fan-out, fan-in
 // pattern:
 func ExampleConfig() {
 	// define a simple worker function that spawns a new goroutine to

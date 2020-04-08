@@ -15,6 +15,405 @@ import (
 	"sync"
 )
 
+// Interfaces returns a config intended to fan-in channels with the empty interface
+// as their element type.
+func Interfaces() Config {
+	return Config{
+		SelectFunc: func(done <-chan struct{}, in, out interface{}) bool {
+			select {
+			case <-done:
+				return true
+			case element, more := <-in.(<-chan interface{}):
+				if !more {
+					return true
+				}
+				out.(chan interface{}) <- element
+			}
+			return false
+		},
+	}
+}
+
+// Strings returns a config intended to fan-in channels with string
+// as their element type.
+func Strings() Config {
+	return Config{
+		SelectFunc: func(done <-chan struct{}, in, out interface{}) bool {
+			select {
+			case <-done:
+				return true
+			case element, more := <-in.(<-chan string):
+				if !more {
+					return true
+				}
+				out.(chan string) <- element
+			}
+			return false
+		},
+	}
+}
+
+// ByteSlices returns a config intended to fan-in channels with byte slice
+// as their element type.
+func ByteSlices() Config {
+	return Config{
+		SelectFunc: func(done <-chan struct{}, in, out interface{}) bool {
+			select {
+			case <-done:
+				return true
+			case element, more := <-in.(<-chan []byte):
+				if !more {
+					return true
+				}
+				out.(chan []byte) <- element
+			}
+			return false
+		},
+	}
+}
+
+// Uintptrs returns a config intended to fan-in channels with uintptr
+// as their element type.
+func Uintptrs() Config {
+	return Config{
+		SelectFunc: func(done <-chan struct{}, in, out interface{}) bool {
+			select {
+			case <-done:
+				return true
+			case element, more := <-in.(<-chan uintptr):
+				if !more {
+					return true
+				}
+				out.(chan uintptr) <- element
+			}
+			return false
+		},
+	}
+}
+
+// Bools returns a config intended to fan-in channels with bool
+// as their element type.
+func Bools() Config {
+	return Config{
+		SelectFunc: func(done <-chan struct{}, in, out interface{}) bool {
+			select {
+			case <-done:
+				return true
+			case element, more := <-in.(<-chan bool):
+				if !more {
+					return true
+				}
+				out.(chan bool) <- element
+			}
+			return false
+		},
+	}
+}
+
+// Bytes returns a config intended to fan-in channels with byte
+// as their element type.
+func Bytes() Config {
+	return Config{
+		SelectFunc: func(done <-chan struct{}, in, out interface{}) bool {
+			select {
+			case <-done:
+				return true
+			case element, more := <-in.(<-chan byte):
+				if !more {
+					return true
+				}
+				out.(chan byte) <- element
+			}
+			return false
+		},
+	}
+}
+
+// Runes returns a config intended to fan-in channels with rune
+// as their element type.
+func Runes() Config {
+	return Config{
+		SelectFunc: func(done <-chan struct{}, in, out interface{}) bool {
+			select {
+			case <-done:
+				return true
+			case element, more := <-in.(<-chan rune):
+				if !more {
+					return true
+				}
+				out.(chan rune) <- element
+			}
+			return false
+		},
+	}
+}
+
+// Complex64s returns a config intended to fan-in channels with complex64
+// as their element type.
+func Complex64s() Config {
+	return Config{
+		SelectFunc: func(done <-chan struct{}, in, out interface{}) bool {
+			select {
+			case <-done:
+				return true
+			case element, more := <-in.(<-chan complex64):
+				if !more {
+					return true
+				}
+				out.(chan complex64) <- element
+			}
+			return false
+		},
+	}
+}
+
+// Complex128s returns a config intended to fan-in channels with complex128
+// as their element type.
+func Complex128s() Config {
+	return Config{
+		SelectFunc: func(done <-chan struct{}, in, out interface{}) bool {
+			select {
+			case <-done:
+				return true
+			case element, more := <-in.(<-chan complex128):
+				if !more {
+					return true
+				}
+				out.(chan complex128) <- element
+			}
+			return false
+		},
+	}
+}
+
+// Float32s returns a config intended to fan-in channels with float32
+// as their element type.
+func Float32s() Config {
+	return Config{
+		SelectFunc: func(done <-chan struct{}, in, out interface{}) bool {
+			select {
+			case <-done:
+				return true
+			case element, more := <-in.(<-chan float32):
+				if !more {
+					return true
+				}
+				out.(chan float32) <- element
+			}
+			return false
+		},
+	}
+}
+
+// Float64s returns a config intended to fan-in channels with float64
+// as their element type.
+func Float64s() Config {
+	return Config{
+		SelectFunc: func(done <-chan struct{}, in, out interface{}) bool {
+			select {
+			case <-done:
+				return true
+			case element, more := <-in.(<-chan float64):
+				if !more {
+					return true
+				}
+				out.(chan float64) <- element
+			}
+			return false
+		},
+	}
+}
+
+// Ints returns a config intended to fan-in channels with int
+// as their element type.
+func Ints() Config {
+	return Config{
+		SelectFunc: func(done <-chan struct{}, in, out interface{}) bool {
+			select {
+			case <-done:
+				return true
+			case element, more := <-in.(<-chan int):
+				if !more {
+					return true
+				}
+				out.(chan int) <- element
+			}
+			return false
+		},
+	}
+}
+
+// Uints returns a config intended to fan-in channels with uint
+// as their element type.
+func Uints() Config {
+	return Config{
+		SelectFunc: func(done <-chan struct{}, in, out interface{}) bool {
+			select {
+			case <-done:
+				return true
+			case element, more := <-in.(<-chan uint):
+				if !more {
+					return true
+				}
+				out.(chan uint) <- element
+			}
+			return false
+		},
+	}
+}
+
+// Int8s returns a config intended to fan-in channels with int8
+// as their element type.
+func Int8s() Config {
+	return Config{
+		SelectFunc: func(done <-chan struct{}, in, out interface{}) bool {
+			select {
+			case <-done:
+				return true
+			case element, more := <-in.(<-chan int8):
+				if !more {
+					return true
+				}
+				out.(chan int8) <- element
+			}
+			return false
+		},
+	}
+}
+
+// Uint8s returns a config intended to fan-in channels with uint8
+// as their element type.
+func Uint8s() Config {
+	return Config{
+		SelectFunc: func(done <-chan struct{}, in, out interface{}) bool {
+			select {
+			case <-done:
+				return true
+			case element, more := <-in.(<-chan uint8):
+				if !more {
+					return true
+				}
+				out.(chan uint8) <- element
+			}
+			return false
+		},
+	}
+}
+
+// Int16s returns a config intended to fan-in channels with int16
+// as their element type.
+func Int16s() Config {
+	return Config{
+		SelectFunc: func(done <-chan struct{}, in, out interface{}) bool {
+			select {
+			case <-done:
+				return true
+			case element, more := <-in.(<-chan int16):
+				if !more {
+					return true
+				}
+				out.(chan int16) <- element
+			}
+			return false
+		},
+	}
+}
+
+// Uint16s returns a config intended to fan-in channels with uint16
+// as their element type.
+func Uint16s() Config {
+	return Config{
+		SelectFunc: func(done <-chan struct{}, in, out interface{}) bool {
+			select {
+			case <-done:
+				return true
+			case element, more := <-in.(<-chan uint16):
+				if !more {
+					return true
+				}
+				out.(chan uint16) <- element
+			}
+			return false
+		},
+	}
+}
+
+// Int32s returns a config intended to fan-in channels with int32
+// as their element type.
+func Int32s() Config {
+	return Config{
+		SelectFunc: func(done <-chan struct{}, in, out interface{}) bool {
+			select {
+			case <-done:
+				return true
+			case element, more := <-in.(<-chan int32):
+				if !more {
+					return true
+				}
+				out.(chan int32) <- element
+			}
+			return false
+		},
+	}
+}
+
+// Uint32s returns a config intended to fan-in channels with uint32
+// as their element type.
+func Uint32s() Config {
+	return Config{
+		SelectFunc: func(done <-chan struct{}, in, out interface{}) bool {
+			select {
+			case <-done:
+				return true
+			case element, more := <-in.(<-chan uint32):
+				if !more {
+					return true
+				}
+				out.(chan uint32) <- element
+			}
+			return false
+		},
+	}
+}
+
+// Int64s returns a config intended to fan-in channels with int64
+// as their element type.
+func Int64s() Config {
+	return Config{
+		SelectFunc: func(done <-chan struct{}, in, out interface{}) bool {
+			select {
+			case <-done:
+				return true
+			case element, more := <-in.(<-chan int64):
+				if !more {
+					return true
+				}
+				out.(chan int64) <- element
+			}
+			return false
+		},
+	}
+}
+
+// Uint64s returns a config intended to fan-in channels with uint64
+// as their element type.
+func Uint64s() Config {
+	return Config{
+		SelectFunc: func(done <-chan struct{}, in, out interface{}) bool {
+			select {
+			case <-done:
+				return true
+			case element, more := <-in.(<-chan uint64):
+				if !more {
+					return true
+				}
+				out.(chan uint64) <- element
+			}
+			return false
+		},
+	}
+}
+
 // SelectFunc is a function that implements the core logic of a fan-in implementation for a particular
 // type. They should contain a single select statement that listens on the `done`
 // channel and the `in` channel. They must type-assert the `in` channel to be a
@@ -27,7 +426,7 @@ import (
 //	 		select {
 //	 		case <-done:
 //	 			return true
-//	 		case element, more := <-in.(chan int):
+//	 		case element, more := <-in.(<-chan int):
 //	 			if !more {
 //	 				return true
 //	 			}
@@ -88,7 +487,7 @@ func reflectiveSelectFunc(done <-chan struct{}, in, out interface{}) (shouldStop
 
 // FanIn accepts a done channel and a variable number of channels. It returns a
 // receive-only channel of the same type as the input channels, which must be type-asserted
-// by the caller in order to use it. While the done channel is not closed, values sent over the input
+// by the caller in order to be usable. While the done channel is not closed, values sent over the input
 // channels will become available on the returned channel. When all input channels
 // close or the done channel closes, the output channel will close.
 //
@@ -129,6 +528,8 @@ func (c Config) FanIn(done <-chan struct{}, channels ...interface{}) interface{}
 	// launch a worker goroutine for each input channel
 	for _, channel := range channels {
 		go func(loopBody SelectFunc, done <-chan struct{}, inChan, outChan interface{}) {
+			// ensure that the inChan to each fan-in worker is receive-only
+			inChan = reflect.ValueOf(inChan).Convert(reflect.ChanOf(reflect.RecvDir, elementType)).Interface()
 			// if no select function provided, fall back on a reflection-based implementation
 			if loopBody == nil {
 				loopBody = reflectiveSelectFunc
