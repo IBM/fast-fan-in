@@ -250,7 +250,7 @@ func BenchmarkFanIn(b *testing.B) {
 				select {
 				case <-done:
 					return true
-				case element, more := <-in.(chan int):
+				case element, more := <-in.(<-chan int):
 					if !more {
 						return true
 					}
