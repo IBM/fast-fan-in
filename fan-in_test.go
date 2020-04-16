@@ -277,7 +277,7 @@ func BenchmarkFanIn(b *testing.B) {
 				b.Run(fmt.Sprintf("chans:%d,elems:%d,impl:%s", numChannels, numElements, setup.Name), func(b *testing.B) {
 					inputs := make([]chan int, numChannels)
 					for i := range inputs {
-						inputs[i] = make(chan int)
+						inputs[i] = make(chan int, numElements/numChannels+(numElements%numChannels))
 					}
 					done, output := setup.Setup(inputs)
 					defer close(done)
