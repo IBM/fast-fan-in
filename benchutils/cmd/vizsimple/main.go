@@ -107,6 +107,7 @@ func main() {
 	} else if filterByElements {
 		p.Title.Text += fmt.Sprintf(" with %d elements sent", elementsFilter)
 	}
+	p.Title.Text += " (lower is better)"
 	p.Y.Label.Text = "ns/element"
 	if filterByChannels && filterByElements {
 		p.X.Label.Text = "implementation"
