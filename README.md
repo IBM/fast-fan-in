@@ -149,32 +149,23 @@ The graph below visualizes the relative performance of fanning-in channels three
 ways:
 
 - **Concrete**: Code specialized completely to the channel type (like the snippet above in [rationale](#rationale))
-- **Hybrid**: Our approach with an anonymous function that provides the type information
-- **Reflect**: Our fallback 100% reflection-based approach (which is the fastest reflection-based option that we could figure out).
+- **Hybrid-Closure**: Our approach with an anonymous function that provides the type information
+- **Hybrid-Reflect**: Our fallback 100% reflection-based approach (which is the fastest reflection-based option that we could figure out).
 
 ![benchmark visualization](https://raw.githubusercontent.com/IBM/fast-fan-in/master/img/benchmarks.png)
 
-Each cluster of bars represents a different number of elements sent through the
-fan.
+As the chart demonstrates, the **Hybrid-Closure** approach can realize nearly the same performance as using a type-specialized rewrite, even when managing many channels.
 
-The nine bars in each cluster are the three different approaches using three different
-quantities of channels. Here is a key for the bars (there's also one in the bottom right,
-but it's hard to read):
+You can replicate these benchmarks by running the following (this process takes a long time):
 
-1. **Concrete** with 1 channel
-2. **Concrete** with 10 channels
-3. **Concrete** with 100 channels
-4. **Hybrid** with 1 channel
-5. **Hybrid** with 10 channels
-6. **Hybrid** with 100 channels
-7. **Reflect** with 1 channel
-8. **Reflect** with 10 channels
-9. **Reflect** with 100 channels
+```shell
+go test -bench=. -benchtime=30s -timeout 1h -run="" 2>&1 | tee benchmark-data
+go run ./benchutils/cmd/vizsimple/ -elements 100000 -output 100000-elements.png < benchmark-data
+```
 
-The rightmost set of bars reflects the results from the benchmark which sent 100,000
-elements through the channels. You can see that the y-axis indicates that the
-**Concrete** and **Hybrid** approaches perform nearly the same for all quantities of
-channels tested, while the **Reflect** approach suffers a steep penalty.
+The file `100000-elements.png` will be a visualization like the above, but populated with your benchmark results.
+
+The tool supports slicing the benchmark data with different numbers of elements and channels, see the source for details.
 
 ## Notes
 
