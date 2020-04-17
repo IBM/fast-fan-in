@@ -14,74 +14,57 @@ Golang fan-in pattern efficiently adaptable to any channel type without code gen
 This package provides convenient and efficient mechanisms for combining many channels
 with the same element type into one channel with that element type.
 
+### Primitive Types
+
 For any primitive type in Go, this package provides helper methods to "fan-in" many
 channels with that primitive as the element type. For instance, if you have several
 channels of integers:
 
 ```go
-    var a, b, c chan int // assume these are created elsewhere and are in use
+var a, b, c chan int // assume these are created elsewhere and are in use
 
-    // We can close this done channel to stop the fan-in operation before all of the
-    // input channels close
-    done := make(chan struct{})
+// We can close this done channel to stop the fan-in operation before all of the
+// input channels close
+done := make(chan struct{})
 
-    // all values sent on a, b, and c will be readable from combined, which will only
-    // close when either all of a, b, and c close OR done closes
-    combined := fan.Ints().FanIn(done, a, b, c).(<-chan int)
+// all values sent on a, b, and c will be readable from combined, which will only
+// close when either all of a, b, and c close OR done closes
+combined := fan.Ints().FanIn(done, a, b, c).(<-chan int)
 ```
 
-For non-primitive types, this package provides both an easy-to-use (but inefficient)
-reflection-based approach that requires no boilerplate and an efficient implementation
-that can be customized via a helper function to work with any Go type.
+### Custom Types (Efficient)
 
-To use the inefficient reflection-based approach on a custom type, you can do:
-
-```go
-    type MyCustomType struct {
-        A, B int
-        C string
-    }
-    var a, b, c chan MyCustomType // assume these are created elsewhere and are in use
-
-    // We can close this done channel to stop the fan-in operation before all of the
-    // input channels close
-    done := make(chan struct{})
-
-    // all values sent on a, b, and c will be readable from combined, which will only
-    // close when either all of a, b, and c close OR done closes
-    combined := fan.Config{}.FanIn(done, a, b, c).(<-chan MyCustomType)
-```
-
-To accelerate the fan-in operation to nearly the same speed as an implementation specialized
-to your custom type, simply provide a SelectFunc implementation within the fan.Config:
+For non-primitive types, you can achieve good performance by providing an anonymous function
+that type-asserts the channels to the appropriate element type (avoiding reflection on the
+hot path):
 
 ```go
-    type MyCustomType struct {
-        A, B int
-        C string
-    }
-    var a, b, c chan MyCustomType // assume these are created elsewhere and are in use
+type MyCustomType struct {
+    A, B int
+    C string
+}
+var a, b, c chan MyCustomType // assume these are created elsewhere and are in use
 
-    // We can close this done channel to stop the fan-in operation before all of the
-    // input channels close
-    done := make(chan struct{})
+// We can close this done channel to stop the fan-in operation before all of the
+// input channels close
+done := make(chan struct{})
 
-    // all values sent on a, b, and c will be readable from combined, which will only
-    // close when either all of a, b, and c close OR done closes
-    combined := fan.Config{
-        SelectFunc: func(done <-chan struct{}, in, out interface{}) bool {
-	 		select {
-	 		case <-done:
-	 			return true
-	 		case element, more := <-in.(<-chan MyCustomType):
-	 			if !more {
-	 				return true
-	 			}
-	 			out.(chan MyCustomType) <- element
-	 		}
-	 		return false
-	 	}
-    }.FanIn(done, a, b, c).(<-chan MyCustomType)
+// all values sent on a, b, and c will be readable from combined, which will only
+// close when either all of a, b, and c close OR done closes
+combined := fan.Config{
+    SelectFunc: func(done <-chan struct{}, in, out interface{}) bool {
+ 		select {
+ 		case <-done:
+ 			return true
+ 		case element, more := <-in.(<-chan MyCustomType):
+ 			if !more {
+ 				return true
+ 			}
+ 			out.(chan MyCustomType) <- element
+ 		}
+ 		return false
+ 	}
+}.FanIn(done, a, b, c).(<-chan MyCustomType)
 ```
 
 This small bit of boilerplate captures the necessary type information to avoid performing
@@ -91,6 +74,29 @@ as a custom implementation for your type.
 All SelectFunc implementations look essentially the same, with the only difference being
 the element type of the channels in the two type assertions.
 
+### Custom Types (Easy)
+
+If your use-case is not performance-critical, we also provide a reflection-based fallback
+implementation which is used when no SelectFunc is provided. See [benchmarks](#benchmarks)
+to understand the performance effect of this implementation.
+
+To use the inefficient reflection-based approach on a custom type, you can do:
+
+```go
+type MyCustomType struct {
+    A, B int
+    C string
+}
+var a, b, c chan MyCustomType // assume these are created elsewhere and are in use
+
+// We can close this done channel to stop the fan-in operation before all of the
+// input channels close
+done := make(chan struct{})
+
+// all values sent on a, b, and c will be readable from combined, which will only
+// close when either all of a, b, and c close OR done closes
+combined := fan.Config{}.FanIn(done, a, b, c).(<-chan MyCustomType)
+```
 
 ## Rationale
 
@@ -136,7 +142,7 @@ This code must be re-implemented for every type of data that you want to send
 over the channels, and therefore is extremely non-DRY in pratice.
 
 We wrote this package to implement fan-in once, but in a way that can be re-used
-any type of channel element. We also wanted a solution that is approximately as
+for any type of channel element. We also wanted a solution that is approximately as
 fast as re-implementing the code for each type.
 
 We've built a system that uses a minimal quantity of reflection (none on the
