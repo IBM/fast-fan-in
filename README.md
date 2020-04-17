@@ -160,7 +160,7 @@ You can replicate these benchmarks by running the following (this process takes 
 
 ```shell
 go test -bench=. -benchtime=30s -timeout 1h -run="" 2>&1 | tee benchmark-data
-go run ./benchutils/cmd/vizsimple/ -elements 100000 -output 100000-elements.png < benchmark-data
+cd benchutils; go run ./cmd/vizsimple/ -elements 100000 -output 100000-elements.png < benchmark-data
 ```
 
 The file `100000-elements.png` will be a visualization like the above, but populated with your benchmark results.
