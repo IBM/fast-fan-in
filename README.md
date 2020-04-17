@@ -2,7 +2,11 @@
 
 [![GoDoc](https://godoc.org/github.com/IBM/fast-fan-in?status.svg)](https://godoc.org/github.com/IBM/fast-fan-in)
 
-Golang fan-in pattern efficiently adaptable to any channel type without code generation
+Golang fan-in pattern efficiently adaptable to any channel type without code generation.
+
+For context on the fan-in pattern (and fan-out, the inverse), see [this blog post](https://blog.golang.org/pipelines).
+
+For an end-to-end example of using this library with fan out and fan in, see [this example](https://github.com/IBM/fast-fan-in/blob/master/fan-in_test.go#L303).
 
 - [Usage](#usage)
 - [Rationale](#rationale)
@@ -32,7 +36,7 @@ done := make(chan struct{})
 combined := fan.Ints().FanIn(done, a, b, c).(<-chan int)
 ```
 
-### Custom Types (Efficient)
+### Custom Types
 
 For non-primitive types, you can achieve good performance by providing an anonymous function
 that type-asserts the channels to the appropriate element type (avoiding reflection on the
@@ -74,7 +78,7 @@ as a custom implementation for your type.
 All SelectFunc implementations look essentially the same, with the only difference being
 the element type of the channels in the two type assertions.
 
-### Custom Types (Easy)
+### Custom Types with Reflection
 
 If your use-case is not performance-critical, we also provide a reflection-based fallback
 implementation which is used when no SelectFunc is provided. See [benchmarks](#benchmarks)
@@ -155,8 +159,8 @@ The graph below visualizes the relative performance of fanning-in channels three
 ways:
 
 - **Concrete**: Code specialized completely to the channel type (like the snippet above in [rationale](#rationale))
-- **Hybrid-Closure**: Our approach with an anonymous function that provides the type information
-- **Hybrid-Reflect**: Our fallback 100% reflection-based approach (which is the fastest reflection-based option that we could figure out).
+- **Hybrid-Closure**: Our [approach with an anonymous function](#custom-types) that provides the type information
+- **Hybrid-Reflect**: Our [fallback 100% reflection-based approach](#custom-types-with-reflection) (which is the fastest reflection-based option that we could figure out).
 
 ![benchmark visualization](https://raw.githubusercontent.com/IBM/fast-fan-in/master/img/benchmarks.png)
 
