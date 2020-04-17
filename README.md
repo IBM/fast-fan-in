@@ -40,8 +40,8 @@ hot path):
 
 ```go
 type MyCustomType struct {
-    A, B int
-    C string
+    Foo, Bar int
+    Baz string
 }
 var a, b, c chan MyCustomType // assume these are created elsewhere and are in use
 
@@ -84,8 +84,8 @@ To use the inefficient reflection-based approach on a custom type, you can do:
 
 ```go
 type MyCustomType struct {
-    A, B int
-    C string
+    Foo, Bar int
+    Baz string
 }
 var a, b, c chan MyCustomType // assume these are created elsewhere and are in use
 

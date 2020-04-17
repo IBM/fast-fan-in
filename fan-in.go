@@ -31,8 +31,8 @@ that can be customized via a helper function to work with any Go type.
 To use the inefficient reflection-based approach on a custom type, you can do:
 
     type MyCustomType struct {
-        A, B int
-        C string
+        Foo, Bar int
+        Baz string
     }
     var a, b, c chan MyCustomType // assume these are created elsewhere and are in use
 
@@ -48,8 +48,8 @@ To accelerate the fan-in operation to nearly the same speed as an implementation
 to your custom type, simply provide a SelectFunc implementation within the fan.Config:
 
     type MyCustomType struct {
-        A, B int
-        C string
+        Foo, Bar int
+        Baz string
     }
     var a, b, c chan MyCustomType // assume these are created elsewhere and are in use
 
