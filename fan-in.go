@@ -24,9 +24,49 @@ channels of integers:
     // close when either all of a, b, and c close OR done closes
     combined := fan.Ints().FanIn(done, a, b, c).(<-chan int)
 
-For non-primitive types, this package provides both an easy-to-use (but inefficient)
-reflection-based approach that requires no boilerplate and an efficient implementation
-that can be customized via a helper function to work with any Go type.
+
+For non-primitive types, you can achieve good performance by providing an anonymous function
+that type-asserts the channels to the appropriate element type (avoiding reflection on the
+hot path):
+
+    type MyCustomType struct {
+        Foo, Bar int
+        Baz string
+    }
+    var a, b, c chan MyCustomType // assume these are created elsewhere and are in use
+
+    // We can close this done channel to stop the fan-in operation before all of the
+    // input channels close
+    done := make(chan struct{})
+
+    // all values sent on a, b, and c will be readable from combined, which will only
+    // close when either all of a, b, and c close OR done closes
+    combined := fan.Config{
+        SelectFunc: func(done <-chan struct{}, in, out interface{}) bool {
+     		select {
+     		case <-done:
+     			return true
+     		case element, more := <-in.(<-chan MyCustomType):
+     			if !more {
+     				return true
+     			}
+     			out.(chan MyCustomType) <- element
+     		}
+     		return false
+     	}
+    }.FanIn(done, a, b, c).(<-chan MyCustomType)
+
+This small bit of boilerplate captures the necessary type information to avoid performing
+any reflection while passing data read from the channels, resulting in the same throughput
+as a custom implementation for your type.
+
+All SelectFunc implementations look essentially the same, with the only difference being
+the element type of the channels in the two type assertions.
+
+
+If your use-case is not performance-critical, we also provide a reflection-based fallback
+implementation which is used when no SelectFunc is provided. See [benchmarks](#benchmarks)
+to understand the performance effect of this implementation.
 
 To use the inefficient reflection-based approach on a custom type, you can do:
 
@@ -43,43 +83,6 @@ To use the inefficient reflection-based approach on a custom type, you can do:
     // all values sent on a, b, and c will be readable from combined, which will only
     // close when either all of a, b, and c close OR done closes
     combined := fan.Config{}.FanIn(done, a, b, c).(<-chan MyCustomType)
-
-To accelerate the fan-in operation to nearly the same speed as an implementation specialized
-to your custom type, simply provide a SelectFunc implementation within the fan.Config:
-
-    type MyCustomType struct {
-        Foo, Bar int
-        Baz string
-    }
-    var a, b, c chan MyCustomType // assume these are created elsewhere and are in use
-
-    // We can close this done channel to stop the fan-in operation before all of the
-    // input channels close
-    done := make(chan struct{})
-
-    // all values sent on a, b, and c will be readable from combined, which will only
-    // close when either all of a, b, and c close OR done closes
-    combined := fan.Config{
-        SelectFunc: func(done <-chan struct{}, in, out interface{}) bool {
-	 		select {
-	 		case <-done:
-	 			return true
-	 		case element, more := <-in.(<-chan MyCustomType):
-	 			if !more {
-	 				return true
-	 			}
-	 			out.(chan MyCustomType) <- element
-	 		}
-	 		return false
-	 	}
-    }.FanIn(done, a, b, c).(<-chan MyCustomType)
-
-This small bit of boilerplate captures the necessary type information to avoid performing
-any reflection while passing data read from the channels, resulting in the same throughput
-as a custom implementation for your type.
-
-All SelectFunc implementations look essentially the same, with the only difference being
-the element type of the channels in the two type assertions.
 
 */
 package fan
