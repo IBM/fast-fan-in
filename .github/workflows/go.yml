@@ -30,3 +30,8 @@ jobs:
     
     - name: Test
       run: go test -v -cover ./...
+    
+    - name: Lint
+      run: |
+        curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s -- -b $(go env GOPATH)/bin v1.24.0
+        golangci-lint run ./...
