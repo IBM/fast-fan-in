@@ -6,6 +6,7 @@ import (
 	"image/color"
 	"log"
 	"os"
+	"regexp"
 	"sort"
 	"strconv"
 	"strings"
@@ -66,7 +67,8 @@ func main() {
 	results := make(map[string][]Result)
 	for key, value := range set {
 		benchmark := strings.Split(key, "/")[1] // get the non-generic part of the name
-		benchmark = strings.TrimSuffix(benchmark, "-4")
+		// remove suffix of the number of CPU cores
+		benchmark = regexp.MustCompile("-[0-9]+$").ReplaceAllString(benchmark, "")
 		parts := strings.Split(benchmark, ",")
 		channels, _ := strconv.Atoi(strings.Split(parts[0], ":")[1])
 		if filterByChannels && channels != channelsFilter {
